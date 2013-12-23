@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Base>
+	<mainForm title="ReportsTitle" icoPath="./ico" pathOfFormState="./frmState" />
+	<COM databits="8" parity="None" stopbits="1" encoding="rtu"/>
+	<speeds>
+		<speed id="1" value="1200"/>
+		<speed id="2" value="2400"/>
+		<speed id="3" value="4800"/>
+		<speed id="4" value="9600" defaultBeg="true" defaultEnd="true"/>
+		<speed id="5" value="14400"/>
+		<speed id="6" value="19200"/>
+		<speed id="7" value="38400"/>
+		<speed id="8" value="56000"/>
+		<speed id="9" value="57600"/>
+		<speed id="10" value="115200"/>
+	</speeds>
+	<devices>
+		<device name="Akon">
+			<serialNumberAddress>2</serialNumberAddress>
+			<serialNumberLength>2</serialNumberLength>
+			<modbusIdAddress>ABCE</modbusIdAddress>
+			<TS>b10;c10;d10;e10</TS>
+		</device>
+		<device name="NIK 1F" default="true">
+			<serialNumberAddress>F01A</serialNumberAddress>
+			<serialNumberLength>8</serialNumberLength>
+			<modbusIdAddress>F200</modbusIdAddress>
+			<TS>1200;1202;1204;1206</TS>
+			<TI>1000;1002;1004;1006;1008;100a</TI>
+		</device>
+	</devices>
+	<findAddress begin="1" end="3" />
+</Base>
