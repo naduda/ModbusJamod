@@ -33,7 +33,6 @@ public class Base implements Serializable{
 				return d;
 			}
 		}
-		System.out.println("dddd");
 		return null;
 	}
 	

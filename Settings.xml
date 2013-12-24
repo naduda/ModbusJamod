@@ -19,15 +19,19 @@
 			<serialNumberAddress>2</serialNumberAddress>
 			<serialNumberLength>2</serialNumberLength>
 			<modbusIdAddress>ABCE</modbusIdAddress>
-			<TS>b10;c10;d10;e10</TS>
+			<signals>
+				<signal type="TS" address="b10;c10;d10;e10"/>
+			</signals>
 		</device>
 		<device name="NIK 1F" default="true">
 			<serialNumberAddress>F01A</serialNumberAddress>
 			<serialNumberLength>8</serialNumberLength>
 			<modbusIdAddress>F200</modbusIdAddress>
-			<TS>1200;1202;1204;1206</TS>
-			<TI>1000;1002;1004;1006;1008;100a</TI>
+			<signals>
+				<signal type="TS" offset="1200" count="4"/>
+				<signal type="TI" offset="1000" count="6"/>
+			</signals>
 		</device>
 	</devices>
-	<findAddress begin="1" end="3" />
+	<findAddress begin="70" end="73" />
 </Base>

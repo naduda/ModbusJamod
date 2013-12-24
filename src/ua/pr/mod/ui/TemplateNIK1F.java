@@ -44,7 +44,7 @@ public class TemplateNIK1F extends JDialog {
 	private JButton btnTU2;
 	private JLabel lbStatus;
 	
-	private List<Integer> ts;
+	private List<Float> ts;
 	private List<Float> ti;
 	private boolean boolTU;
 	private int idTU;
@@ -143,11 +143,17 @@ public class TemplateNIK1F extends JDialog {
 		while(isVisible()) {
 			try {
 				lbStatus.setText("Cycles - " + iter + " (errors - " + iterFault + ")");
-				NumArray resTS = tm.getTS(address, device, trans);
-				tries = resTS.getCounter();				
-				List<Integer> ts = (List<Integer>) resTS.getList();
+				NumArray resTS = null;
+				if (device.getSignalByName("ts").getOffset() != null) {
+					resTS = tm.getSignalsOnePackage(address, device, trans, "TS", "int");
+				} else {
+					resTS = tm.getSignals(address, device, trans, "TS", "int");
+				}
 				
-				NumArray resTI = tm.getTI(address, device, trans);
+				tries = resTS.getCounter();				
+				List<Float> ts = (List<Float>) resTS.getList();
+				
+				NumArray resTI = tm.getSignalsOnePackage(address, device, trans, "TI", "float");
 				List<Float> ti = (List<Float>) resTI.getList();
 				tries = tries + resTI.getCounter();
 				if (boolTU) {
@@ -155,17 +161,13 @@ public class TemplateNIK1F extends JDialog {
 					iterFault = iterFault + tries;
 					boolTU = false;
 				}
-
-				try {						
-					setTs(ts);
-					setTi(ti);
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
+					
+				setTs(ts);
+				setTi(ti);
 				
 				int indTS = 0;
 				Color col = null;
-				for (Integer tsi : ts) {
+				for (Float tsi : ts) {
 					if(tsi == 1) {
 						col = Color.RED;
 					} else {
@@ -253,11 +255,11 @@ public class TemplateNIK1F extends JDialog {
 		
 	}
 	//	--------------------------------------------------------------
-	public List<Integer> getTs() {
+	public List<Float> getTs() {
 		return ts;
 	}
 
-	public void setTs(List<Integer> ts) {
+	public void setTs(List<Float> ts) {
 		this.ts = ts;
 	}
 

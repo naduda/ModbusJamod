@@ -1,12 +1,13 @@
 package ua.pr.mod.xml.objects;
 
 import java.io.Serializable;
-import java.util.Hashtable;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Device implements Serializable {
@@ -19,11 +20,10 @@ public class Device implements Serializable {
 	@XmlElement
 	private String serialNumberLength;
 	@XmlElement
-	private String modbusIdAddress;
-	@XmlElement(name="TS")
-	private String tsu;
-	@XmlElement(name="TI")
-	private String tis;
+	private String modbusIdAddress;	
+	@XmlElementWrapper
+	@XmlElement(name="signal")
+	private List<Signal> signals;
 	@XmlAttribute(name="default")
 	private boolean default_;
 	
@@ -64,42 +64,12 @@ public class Device implements Serializable {
 		this.modbusIdAddress = modbusIdAddress;
 	}
 
-	public String getTsu() {
-		return tsu;
+	public List<Signal> getSignals() {
+		return signals;
 	}
 
-	public void setTsu(String tsu) {
-		this.tsu = tsu;
-	}
-
-	public Hashtable<Integer, String> getTS() {
-		Hashtable<Integer, String> ret = new Hashtable<>();
-		String sTs = getTsu();
-		String[] arr = sTs.split(";");
-		
-		for (int i = 0; i < arr.length; i++) {
-			ret.put(i + 1, arr[i]);
-		}
-		return ret;
-	}
-
-	public String getTis() {
-		return tis;
-	}
-	
-	public Hashtable<Integer, String> getTI() {
-		Hashtable<Integer, String> ret = new Hashtable<>();
-		String sTs = getTis();
-		String[] arr = sTs.split(";");
-		
-		for (int i = 0; i < arr.length; i++) {
-			ret.put(i + 1, arr[i]);
-		}
-		return ret;
-	}
-
-	public void setTis(String tis) {
-		this.tis = tis;
+	public void setSignals(List<Signal> signals) {
+		this.signals = signals;
 	}
 
 	public boolean isDefault_() {
@@ -108,5 +78,14 @@ public class Device implements Serializable {
 
 	public void setDefault_(boolean default_) {
 		this.default_ = default_;
+	}
+//	----------------------------------------------
+	public Signal getSignalByName(String name) {
+		for (Signal s : signals) {
+			if (s.getType().toLowerCase().equals(name.toLowerCase())) {
+				return s;
+			}
+		}
+		return null;
 	}
 }

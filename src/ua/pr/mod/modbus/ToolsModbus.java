@@ -12,6 +12,7 @@ import java.util.Properties;
 
 import ua.pr.mod.common.NumArray;
 import ua.pr.mod.xml.objects.Device;
+import ua.pr.mod.xml.objects.Signal;
 import net.wimpi.modbus.ModbusException;
 import net.wimpi.modbus.ModbusIOException;
 import net.wimpi.modbus.ModbusSlaveException;
@@ -295,39 +296,60 @@ public class ToolsModbus implements Serializable {
 		return res;
 	}
 	
-	public NumArray getTS(int address, Device device, ModbusSerialTransaction trans) {
-		int tries = 0;
-		List<Integer> res = new ArrayList<>();
-
-		String sReq = device.getTS().get(1);
-		ReadMultipleRegistersRequest req = 
-				new ReadMultipleRegistersRequest(Integer.parseInt(sReq, 16), device.getTS().size() * 2);
-		req.setUnitID(address);
-		req.setHeadless();
-
-		ReadMultipleRegistersResponse resp = null;
-		try {
-			trans.setRequest(req);
-			tries = trans.execute();
-			resp = (ReadMultipleRegistersResponse) trans.getResponse();
-
-			for (int i = 0; i < resp.getWordCount()/2; i++) {
-				res.add(resp.getRegisterValue(2 * i + 1));
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return new NumArray(tries, res);
-	}
-	
-	public NumArray getTI(int address, Device device, ModbusSerialTransaction trans) {
+	public NumArray getSignals(int address, Device device, ModbusSerialTransaction trans, 
+			String signalName, String signalType) {
+		
 		int tries = 0;
 		List<Float> res = new ArrayList<>();
 
-		String sReq = device.getTI().get(1);
+		Signal sTI = device.getSignalByName(signalName);
+		String[] lSignals = sTI.getAddress().split(";");
+		
+		ReadMultipleRegistersRequest req = null;
+		ReadMultipleRegistersResponse resp = null;
+		for (String str : lSignals) {
+			req = new ReadMultipleRegistersRequest(Integer.parseInt(str, 16), 2);
+			req.setUnitID(address);
+			req.setHeadless();
+			
+			try {
+				trans.setRequest(req);
+				tries = trans.execute();
+				
+				resp = (ReadMultipleRegistersResponse) trans.getResponse();
+
+				for (int i = 0; i < resp.getWordCount()/2; i++) {
+					ByteBuffer bb = ByteBuffer.allocate(4);
+					for (int j = 0; j < 2; j++) {
+						bb.put(resp.getRegister(2 * i + j).toBytes());
+					}
+					
+					if (signalType.toLowerCase().equals("float")) {
+						res.add(ModbusUtil.registersToFloat(bb.array()));
+					} else if (signalType.toLowerCase().equals("int")) {
+						res.add((float)ModbusUtil.registersToInt(bb.array()));
+					}
+					
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		
+		
+		return new NumArray(tries, res);
+	}
+	
+	public NumArray getSignalsOnePackage(int address, Device device, ModbusSerialTransaction trans, 
+			String signalName, String signalType) {
+		
+		int tries = 0;
+		List<Float> res = new ArrayList<>();
+
+		Signal sTI = device.getSignalByName(signalName);
 		ReadMultipleRegistersRequest req = 
-				new ReadMultipleRegistersRequest(Integer.parseInt(sReq, 16), device.getTI().size() * 2);
+				new ReadMultipleRegistersRequest(Integer.parseInt(sTI.getOffset(), 16), sTI.getCount() * 2);
 		req.setUnitID(address);
 		req.setHeadless();
 
@@ -343,10 +365,16 @@ public class ToolsModbus implements Serializable {
 				for (int j = 0; j < 2; j++) {
 					bb.put(resp.getRegister(2 * i + j).toBytes());
 				}
-				res.add(ModbusUtil.registersToFloat(bb.array()));
+				
+				if (signalType.toLowerCase().equals("float")) {
+					res.add(ModbusUtil.registersToFloat(bb.array()));
+				} else if (signalType.toLowerCase().equals("int")) {
+					res.add((float)ModbusUtil.registersToInt(bb.array()));
+				}
+				
 			}
 		} catch (Exception e) {
-			System.out.println("error getTI");
+			e.printStackTrace();
 		}
 		return new NumArray(tries, res);
 	}
