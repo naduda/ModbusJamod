@@ -26,6 +26,10 @@ public class Device implements Serializable {
 	private List<Signal> signals;
 	@XmlAttribute(name="default")
 	private boolean default_;
+	@XmlAttribute(name="beginAddress")
+	private int beginAddress;
+	@XmlAttribute(name="endAddress")
+	private int endAddress;
 	
 	@Override
 	public String toString() {
@@ -79,7 +83,24 @@ public class Device implements Serializable {
 	public void setDefault_(boolean default_) {
 		this.default_ = default_;
 	}
-//	----------------------------------------------
+	
+	public int getBeginAddress() {
+		return beginAddress;
+	}
+
+	public void setBeginAddress(int beginAddress) {
+		this.beginAddress = beginAddress;
+	}
+
+	public int getEndAddress() {
+		return endAddress;
+	}
+
+	public void setEndAddress(int endAddress) {
+		this.endAddress = endAddress;
+	}
+
+	//	----------------------------------------------
 	public Signal getSignalByName(String name) {
 		for (Signal s : signals) {
 			if (s.getType().toLowerCase().equals(name.toLowerCase())) {

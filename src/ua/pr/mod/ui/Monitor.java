@@ -28,9 +28,9 @@ import ua.pr.mod.modbus.ToolsModbus;
 import ua.pr.mod.xml.objects.Device;
 import net.wimpi.modbus.io.ModbusSerialTransaction;
 
-public class TemplateNIK1F extends JDialog {
+public class Monitor extends JDialog {
 	private static final long serialVersionUID = 1L;
-	private static Logger log = Logger.getLogger(TemplateNIK1F.class.getName());
+	private static Logger log = Logger.getLogger(Monitor.class.getName());
 	
 	private List<JLabel> listTS = new ArrayList<>();
 
@@ -53,7 +53,7 @@ public class TemplateNIK1F extends JDialog {
 	private int address;
 	private Device device;
 	private ModbusSerialTransaction trans;
-	public TemplateNIK1F(int address, Device device, ModbusSerialTransaction trans, ToolsModbus tm) {
+	public Monitor(int address, Device device, ModbusSerialTransaction trans, ToolsModbus tm) {
 		setModal(true);
 		
 		this.address = address;
@@ -143,25 +143,26 @@ public class TemplateNIK1F extends JDialog {
 		while(isVisible()) {
 			try {
 				lbStatus.setText("Cycles - " + iter + " (errors - " + iterFault + ")");
-				NumArray resTS = null;
-				if (device.getSignalByName("ts").getOffset() != null) {
-					resTS = tm.getSignalsOnePackage(address, device, trans, "TS", "int");
-				} else {
-					resTS = tm.getSignals(address, device, trans, "TS", "int");
-				}
+				NumArray resTS = tm.getSignals(address, device, trans, "TS", "int");
 				
 				tries = resTS.getCounter();				
 				List<Float> ts = (List<Float>) resTS.getList();
-				
-				NumArray resTI = tm.getSignalsOnePackage(address, device, trans, "TI", "float");
+
+				NumArray resTI = tm.getSignals(address, device, trans, "TI", "float");
+
 				List<Float> ti = (List<Float>) resTI.getList();
 				tries = tries + resTI.getCounter();
 				if (boolTU) {
-					tries = tries + tm.changeTUnik1F(idTU, trans, device, address);
+					if (device.getName().toLowerCase().equals("akon")) {
+						tries = tries + tm.changeTUAkon(idTU, trans, device, address);
+					} else if (device.getName().toLowerCase().equals("nik 1f")) {
+						tries = tries + tm.changeTUnik1F(idTU, trans, device, address);
+					}
+					
 					iterFault = iterFault + tries;
 					boolTU = false;
-				}
-					
+				}					
+				
 				setTs(ts);
 				setTi(ti);
 				
@@ -176,10 +177,17 @@ public class TemplateNIK1F extends JDialog {
 					setBG(listTS.get(indTS), col);
 					indTS++;
 				}
-				txtCur.setText(String.valueOf(ti.get(0)/1000));
-				txtVolt.setText(String.valueOf(ti.get(1)/1000));
-				txtFreq.setText(ti.get(5).toString());
 				
+				if (device.getName().toLowerCase().equals("nik 1f")) {
+					txtCur.setText(String.valueOf(ti.get(0)/1000));
+					txtVolt.setText(String.valueOf(ti.get(1)/1000));
+					txtFreq.setText(ti.get(5).toString());
+				} else if (device.getName().toLowerCase().equals("akon")) {
+					txtCur.setText(String.valueOf(ti.get(0)/1000));
+					txtVolt.setText(String.valueOf(ti.get(1)/1000));
+//					txtFreq.setText(ti.get(5).toString());
+				}
+								
 				iter++;
 				iterFault = iterFault + tries;
 				tries = 0;

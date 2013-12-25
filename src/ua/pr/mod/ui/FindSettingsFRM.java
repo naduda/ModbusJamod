@@ -48,7 +48,7 @@ public class FindSettingsFRM extends JDialog implements Serializable {
 	private JComboBox<Object> cbSpeedB;
 	private JComboBox<Object> cbSpeedE;
 	
-	public FindSettingsFRM(Base base, TableDevice table, ToolsModbus tm) {
+	public FindSettingsFRM(final Base base, TableDevice table, ToolsModbus tm) {
 		super(new JFrame(), true);
 		setTitle("Параметри пошуку");
 		this.base = base;
@@ -103,11 +103,23 @@ public class FindSettingsFRM extends JDialog implements Serializable {
 		pMainR.add(cbFindOne);		
 		
 		JLabel lbAddrB = new JLabel("Початкова адреса");
-		SpinnerNumberModel modelAddrB = new SpinnerNumberModel(base.getFindAddress().getBegin(), 1, 255, 1);
+		final SpinnerNumberModel modelAddrB = 
+				new SpinnerNumberModel(base.getDeviceByName(cbType.getSelectedItem().toString()).getBeginAddress(), 1, 255, 1);
 		spAddrB = new JSpinner(modelAddrB);
 		JLabel lbAddrE = new JLabel("Кінцева адреса");
-		SpinnerNumberModel modelAddrE = new SpinnerNumberModel(base.getFindAddress().getEnd(), 1, 255, 1);
+		final SpinnerNumberModel modelAddrE = 
+				new SpinnerNumberModel(base.getDeviceByName(cbType.getSelectedItem().toString()).getEndAddress(), 1, 255, 1);
 		spAddrE = new JSpinner(modelAddrE);
+		
+		cbType.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				modelAddrB.setValue(base.getDeviceByName(cbType.getSelectedItem().toString()).getBeginAddress());
+				modelAddrE.setValue(base.getDeviceByName(cbType.getSelectedItem().toString()).getEndAddress());;
+			}
+		});
+		
 		JLabel lbSpeedB = new JLabel("Початкова швидкість");
 		cbSpeedB = new JComboBox<>();
 		((JLabel)cbSpeedB.getRenderer()).setHorizontalAlignment(SwingConstants.RIGHT);

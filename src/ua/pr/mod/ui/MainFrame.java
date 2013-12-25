@@ -51,11 +51,6 @@ public class MainFrame extends FrameXMLMenuLoader implements Serializable {
 		
 		JButton btnFind = (JButton) loader.getMenuItem("btnFind");
 		btnFind.addActionListener(new WindowListenerMainFRM("Find", tm));
-
-		JButton btnTU1 = (JButton) loader.getMenuItem("btnTU1");
-		btnTU1.addActionListener(new WindowListenerMainFRM("TU", table, tm));
-		JButton btnTU2 = (JButton) loader.getMenuItem("btnTU2");
-		btnTU2.addActionListener(new WindowListenerMainFRM("TU", table, tm));
 		
 		JButton btnMonitor = (JButton) loader.getMenuItem("btnMonitor");
 		btnMonitor.addActionListener(new WindowListenerMainFRM("Monitor", tm));
@@ -103,15 +98,6 @@ public class MainFrame extends FrameXMLMenuLoader implements Serializable {
 				System.exit(0);
 			} else if(btnName.toLowerCase().equals("find")) {
 				new FindSettingsFRM(base, table, tm);
-			} else if(btnName.toLowerCase().equals("tu")) {
-				SelectedDevice sd = new SelectedDevice(table);
-				SerialParameters sp = (SerialParameters) table.getClientProperty("SerialParameters");
-				sp.setBaudRate(sd.getSpeed());
-			
-				String text = ((JButton)e.getSource()).getText();
-				text = text.substring(text.length() - 1, text.length());
-				
-				tm.changeTUAkon(Integer.parseInt(text), sp, base.getDeviceByName(sd.getType()), sd.getAddress());
 			} else if(btnName.toLowerCase().equals("monitor")) {
 				SelectedDevice sd = new SelectedDevice(table);
 				SerialParameters sp = (SerialParameters) table.getClientProperty("SerialParameters");
@@ -120,9 +106,9 @@ public class MainFrame extends FrameXMLMenuLoader implements Serializable {
 				ModbusSerialTransaction trans = tm.getTransaction(sp);
 				
 				if (sd.getType().toLowerCase().equals("nik 1f")) {
-					new TemplateNIK1F(sd.getAddress(), base.getDeviceByName(sd.getType()), trans, tm);
+					new Monitor(sd.getAddress(), base.getDeviceByName(sd.getType()), trans, tm);
 				} else if (sd.getType().toLowerCase().equals("akon")) {
-					
+					new Monitor(sd.getAddress(), base.getDeviceByName(sd.getType()), trans, tm);
 				}
 			}
 		}	

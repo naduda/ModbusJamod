@@ -24,8 +24,6 @@ public class Base implements Serializable{
 	@XmlElementWrapper
 	@XmlElement(name="device")
 	private List<Device> devices;
-	@XmlElement(name="findAddress")
-	private FindAddress findAddress;
 
 	public Device getDeviceByName(String name) {
 		for (Device d : devices) {
@@ -67,12 +65,4 @@ public class Base implements Serializable{
 	public void setDevices(List<Device> devices) {
 		this.devices = devices;
 	}
-
-	public FindAddress getFindAddress() {
-		return findAddress;
-	}
-
-	public void setFindAddress(FindAddress findAddress) {
-		this.findAddress = findAddress;
-	}	
 }

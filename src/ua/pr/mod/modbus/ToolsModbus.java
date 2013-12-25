@@ -119,25 +119,21 @@ public class ToolsModbus implements Serializable {
 		ReadMultipleRegistersRequest req = 
 				new ReadMultipleRegistersRequest(Integer.parseInt(device.getSerialNumberAddress(), 16), 
 												 Integer.parseInt(device.getSerialNumberLength()));
-		
-		boolean endFor = false;
+		ReadMultipleRegistersResponse res = null;
+
 		for(int speed : speeds) {
-			if (endFor) {
-				break;
-			}
 			setBaudRate(speed);
 			trans = getTransaction();
 		
 			for (int i = begAddress; i < endAddress + 1; i++) {	
-				ReadMultipleRegistersResponse res = null;
 			    req.setUnitID(i);	
 				req.setHeadless();
-				
-				trans.setRequest(req);		
+
+				trans.setRequest(req);
 				try {
 					trans.execute();
 					res = (ReadMultipleRegistersResponse) trans.getResponse();
-					
+
 					if (res != null) {
 						ByteBuffer bb = ByteBuffer.allocate(res.getWordCount() * 2);
 						for (int n = 0; n < res.getWordCount(); n++) {
@@ -146,10 +142,7 @@ public class ToolsModbus implements Serializable {
 
 						ret.add(new Object[] {device.getName(), req.getUnitID(), 
 								ModbusUtil.registersToInt(bb.array()), speed});
-						if(isOne) {
-							endFor = true;
-							break;
-						}
+						break;
 					}
 				} catch (ModbusIOException e) {
 					System.err.println("ModbusIOException");
@@ -159,24 +152,27 @@ public class ToolsModbus implements Serializable {
 					System.err.println("ModbusException");
 				}
 			}
+			if ((res != null) && (isOne)) {
+				break;
+			}
 		}
 
 		return ret;
 	}
 
-	public void changeTUAkon(int idTU, SerialParameters sp, Device sd, int currentAddress) {
-		trans = getTransaction(sp);
-		int curVal = getTSAkon(idTU, null, sd, currentAddress);
+	public int changeTUAkon(int idTU, ModbusSerialTransaction trans, Device sd, int currentAddress) {
+		float curVal = (Float) getSignals(currentAddress, sd, trans, "TU", "int").getList().get(idTU - 1);
+
+		int tries = 0;	
 		
 		String sCode = idTU == 1 ? "314" : "414";
-		ModbusRequest req = 
-				new ReadMultipleRegistersRequest(Integer.parseInt(sCode, 16), 2);
+		ModbusRequest req = new ReadMultipleRegistersRequest(Integer.parseInt(sCode, 16), 2);
 		trans.setRequest(req);
 		req.setUnitID(currentAddress);
 		req.setHeadless();
 
 		try {
-			trans.execute();
+			tries = trans.execute();
 			ReadMultipleRegistersResponse res = (ReadMultipleRegistersResponse) trans.getResponse();
 
 			ByteBuffer bb = ByteBuffer.allocate(res.getWordCount() * 2);
@@ -202,7 +198,7 @@ public class ToolsModbus implements Serializable {
 			
 			trans.setRequest(wReq);
 
-			trans.execute();
+			tries = tries + trans.execute();
 		} catch (ModbusIOException e1) {
 			e1.printStackTrace();
 		} catch (ModbusSlaveException e1) {
@@ -210,20 +206,18 @@ public class ToolsModbus implements Serializable {
 		} catch (ModbusException e1) {
 			e1.printStackTrace();
 		}
+		
+		return tries;
 	}
 	
 	public int changeTUnik1F(int idTU, ModbusSerialTransaction trans, Device device, int currentAddress) {
 		String sTU = idTU == 1 ? "1209" : "120B";
-		ModbusRequest req = new ReadMultipleRegistersRequest(Integer.parseInt(sTU, 16), 2);		
+
+		ModbusRequest req = null;		
 		int tries = 0;		
 
 		try {
-			trans.setRequest(req);
-			req.setUnitID(currentAddress);
-			req.setHeadless();
-			tries = trans.execute();
-			ReadMultipleRegistersResponse res = (ReadMultipleRegistersResponse) trans.getResponse();	
-			int curVal = res.getRegisterValue(0);
+			float curVal = (Float) getSignals(currentAddress, device, trans, "TU", "int").getList().get(idTU - 1);
 			
 			String sCode = "120D";
 			Register regCode = new SimpleRegister(1);
@@ -239,7 +233,7 @@ public class ToolsModbus implements Serializable {
 			req.setHeadless();			
 			trans.setRequest(req);
 			
-			trans.execute();
+			tries = tries + trans.execute();
 		} catch (ModbusIOException e1) {
 			e1.printStackTrace();
 		} catch (ModbusSlaveException e1) {
@@ -250,55 +244,13 @@ public class ToolsModbus implements Serializable {
 		return tries;
 	}
 	
-	public int getTSAkon(int idTS, SerialParameters sp, Device sd, int currentAddress) {
-		int res = 0;
-		
-		String tsAddr = "";
-		switch (idTS) {
-		case 1:
-			tsAddr = "b10";
-			break;
-		case 2:
-			tsAddr = "c10";
-			break;
-		case 3:
-			tsAddr = "d10";
-			break;
-		case 4:
-			tsAddr = "e10";
-			break;
-		}
-		
-		if (sp != null) {
-			trans = getTransaction(sp);
-		}
-		ReadMultipleRegistersRequest req = 
-				new ReadMultipleRegistersRequest(Integer.parseInt(tsAddr, 16), 2);
-		
-		req.setUnitID(currentAddress);
-		req.setHeadless();
-		trans.setRequest(req);
-		try {
-			trans.execute();
-			ReadMultipleRegistersResponse resp = (ReadMultipleRegistersResponse) trans.getResponse();
-			ByteBuffer bb = ByteBuffer.allocate(resp.getWordCount() * 2);
-			for (int n = 0; n < resp.getWordCount(); n++) {
-				bb.put(resp.getRegister(n).toBytes());
-	        }
-			res = ModbusUtil.registersToInt(bb.array()) == 1 ? 1 : 0;
-		} catch (ModbusIOException e) {
-			e.printStackTrace();
-		} catch (ModbusSlaveException e) {
-			e.printStackTrace();
-		} catch (ModbusException e) {
-			e.printStackTrace();
-		}
-		return res;
-	}
-	
 	public NumArray getSignals(int address, Device device, ModbusSerialTransaction trans, 
 			String signalName, String signalType) {
 		
+		if (device.getSignalByName(signalName).getOffset() != null) {
+			return getSignalsOnePackage(address, device, trans, signalName, signalType);
+		}
+//		-------------------------------------------------------------------------------------
 		int tries = 0;
 		List<Float> res = new ArrayList<>();
 
@@ -335,9 +287,7 @@ public class ToolsModbus implements Serializable {
 				e.printStackTrace();
 			}
 		}
-
-		
-		
+	
 		return new NumArray(tries, res);
 	}
 	

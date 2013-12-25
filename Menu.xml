@@ -4,8 +4,6 @@
 	</menu>
 	<panel align="left">
 		<item uniqueID="btnFind" type="button" name="Find" size="100;20" />
-		<item uniqueID="btnTU1" type="button" name="TU1" size="100;20" />
-		<item uniqueID="btnTU2" type="button" name="TU2" size="100;20" />
 		<item uniqueID="btnMonitor" type="button" name="Monitor" size="100;20" />
 	</panel>
 
