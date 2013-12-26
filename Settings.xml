@@ -15,20 +15,22 @@
 		<speed id="10" value="115200"/>
 	</speeds>
 	<devices>
-		<device name="Akon" beginAddress="1" endAddress="2">
+		<device name="Akon" default="true" beginAddress="1" endAddress="2">
 			<serialNumberAddress>2</serialNumberAddress>
 			<serialNumberLength>2</serialNumberLength>
-			<modbusIdAddress>ABCE</modbusIdAddress>
+			<modbusIdAddress>6</modbusIdAddress>
+			<modbusSaveSettings>8</modbusSaveSettings>
 			<signals>
 				<signal type="TS" address="b10;c10;d10;e10"/>
 				<signal type="TI" address="100;200"/>
 				<signal type="TU" address="310;410"/>
 			</signals>
 		</device>
-		<device name="NIK 1F" default="true" beginAddress="70" endAddress="72">
+		<device name="NIK 1F" beginAddress="70" endAddress="72">
 			<serialNumberAddress>F01A</serialNumberAddress>
 			<serialNumberLength>8</serialNumberLength>
 			<modbusIdAddress>F200</modbusIdAddress>
+			<modbusSaveSettings>1100</modbusSaveSettings>
 			<signals>
 				<signal type="TS" offset="1200" count="4"/>
 				<signal type="TI" offset="1000" count="6"/>

@@ -14,6 +14,7 @@ public class TableDevice extends JTable implements Serializable {
 		dtm = new DefaultTableModel();
 		dtm.setColumnIdentifiers(new String[] {"Тип", "Адреса", "Серійний номер", "Швидкість"});
 		setModel(dtm);
+		getTableHeader().setReorderingAllowed(false);
 	}
 	
 	public void addRow(Object[] row) {

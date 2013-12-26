@@ -21,6 +21,8 @@ public class Device implements Serializable {
 	private String serialNumberLength;
 	@XmlElement
 	private String modbusIdAddress;	
+	@XmlElement
+	private String modbusSaveSettings;	
 	@XmlElementWrapper
 	@XmlElement(name="signal")
 	private List<Signal> signals;
@@ -98,6 +100,14 @@ public class Device implements Serializable {
 
 	public void setEndAddress(int endAddress) {
 		this.endAddress = endAddress;
+	}
+
+	public String getModbusSaveSettings() {
+		return modbusSaveSettings;
+	}
+
+	public void setModbusSaveSettings(String modbusSaveSettings) {
+		this.modbusSaveSettings = modbusSaveSettings;
 	}
 
 	//	----------------------------------------------

@@ -18,7 +18,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import net.wimpi.modbus.io.ModbusSerialTransaction;
 import net.wimpi.modbus.util.SerialParameters;
 import ua.pr.common.ToolsPrLib;
 import ua.pr.menu.FrameXMLMenuLoader;
@@ -54,6 +53,9 @@ public class MainFrame extends FrameXMLMenuLoader implements Serializable {
 		
 		JButton btnMonitor = (JButton) loader.getMenuItem("btnMonitor");
 		btnMonitor.addActionListener(new WindowListenerMainFRM("Monitor", tm));
+		
+		JButton btnSettings = (JButton) loader.getMenuItem("btnSettings");
+		btnSettings.addActionListener(new WindowListenerMainFRM("Settings", tm));
 //		-------------------------------------------------------------
 		JPanel statusBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		JLabel lbStatus = new JLabel("status");
@@ -103,12 +105,24 @@ public class MainFrame extends FrameXMLMenuLoader implements Serializable {
 				SerialParameters sp = (SerialParameters) table.getClientProperty("SerialParameters");
 				sp.setBaudRate(sd.getSpeed());
 				
-				ModbusSerialTransaction trans = tm.getTransaction(sp);
+				tm.setTransaction(sp);
 				
 				if (sd.getType().toLowerCase().equals("nik 1f")) {
-					new Monitor(sd.getAddress(), base.getDeviceByName(sd.getType()), trans, tm);
+					new Monitor(sd.getAddress(), base.getDeviceByName(sd.getType()), tm);
 				} else if (sd.getType().toLowerCase().equals("akon")) {
-					new Monitor(sd.getAddress(), base.getDeviceByName(sd.getType()), trans, tm);
+					new Monitor(sd.getAddress(), base.getDeviceByName(sd.getType()), tm);
+				}
+			} else if(btnName.toLowerCase().equals("settings")) {
+				SelectedDevice sd = new SelectedDevice(table);
+				SerialParameters sp = (SerialParameters) table.getClientProperty("SerialParameters");
+				sp.setBaudRate(sd.getSpeed());
+				
+				tm.setTransaction(sp);
+				
+				if (sd.getType().toLowerCase().equals("nik 1f")) {
+					new Settings(base, sd, tm, table);
+				} else if (sd.getType().toLowerCase().equals("akon")) {
+					new Settings(base, sd, tm, table);
 				}
 			}
 		}	

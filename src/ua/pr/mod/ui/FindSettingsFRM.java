@@ -3,7 +3,6 @@ package ua.pr.mod.ui;
 import gnu.io.CommPortIdentifier;
 
 import java.awt.BorderLayout;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -27,6 +26,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
+import ua.pr.common.ToolsPrLib;
 import ua.pr.mod.modbus.ToolsModbus;
 import ua.pr.mod.xml.objects.Base;
 import ua.pr.mod.xml.objects.ComPortSettings;
@@ -123,6 +123,7 @@ public class FindSettingsFRM extends JDialog implements Serializable {
 		JLabel lbSpeedB = new JLabel("Початкова швидкість");
 		cbSpeedB = new JComboBox<>();
 		((JLabel)cbSpeedB.getRenderer()).setHorizontalAlignment(SwingConstants.RIGHT);
+		
 		JLabel lbSpeedE = new JLabel("Кінцева швидкість");
 		cbSpeedE = new JComboBox<>();
 		((JLabel)cbSpeedE.getRenderer()).setHorizontalAlignment(SwingConstants.RIGHT);
@@ -140,6 +141,15 @@ public class FindSettingsFRM extends JDialog implements Serializable {
 		}
 		cbSpeedB.setSelectedIndex(indBeg);
 		cbSpeedE.setSelectedIndex(indEnd);
+		cbSpeedB.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if (cbSpeedB.getSelectedIndex() > cbSpeedE.getSelectedIndex()) {
+					cbSpeedE.setSelectedIndex(cbSpeedB.getSelectedIndex());
+				}				
+			}
+		});
 		
 		pMainL.add(lbAddrB);
 		pMainL.add(spAddrB);
@@ -182,9 +192,7 @@ public class FindSettingsFRM extends JDialog implements Serializable {
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if (name.toLowerCase().equals("exit")) {
-				getActiveForm((JComponent) e.getSource()).setVisible(false);
-			} else if (name.toLowerCase().equals("find")) {
+			if (name.toLowerCase().equals("find")) {
 				Properties props = new Properties();
 				props.put("Type", cbType.getSelectedItem().toString());
 				props.put("Port", cbPort.getSelectedItem().toString());
@@ -214,18 +222,8 @@ public class FindSettingsFRM extends JDialog implements Serializable {
 				for (Object object : rets) {
 					table.addRow((Object[]) object);
 				}
-
-				getActiveForm((JComponent) e.getSource()).setVisible(false);
 			}
-		}
-		
-		public Container getActiveForm(JComponent b) {
-			Container curObject = b.getParent();
-			while (!curObject.getClass().equals(FindSettingsFRM.class)) {
-				curObject = curObject.getParent();
-			}
-			return curObject;
-		}
-		
+			ToolsPrLib.getActiveForm((JComponent) e.getSource(), FindSettingsFRM.class).setVisible(false);
+		}		
 	}
 }

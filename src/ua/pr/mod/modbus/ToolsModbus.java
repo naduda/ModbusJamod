@@ -62,38 +62,40 @@ public class ToolsModbus implements Serializable {
 		return ret;
 	}
 	
-	public ModbusSerialTransaction getTransaction() {
-		ModbusSerialTransaction trans = null;
-		if (con != null) {
-			con.close();
-		}
-		
-		try {
-			serialParameters = new SerialParameters();
-			serialParameters.setPortName(portName);
-			serialParameters.setBaudRate(baudRate);
-			serialParameters.setDatabits(databits);
-			serialParameters.setParity(parity);
-		    serialParameters.setStopbits(stopbits);
-		    serialParameters.setEncoding(encoding);
-		    serialParameters.setReceiveTimeout(receiveTimeout);
-		    serialParameters.setEcho(false);
-		    
-		    con = new SerialConnection(serialParameters);
-		    con.open();
-		    
-		    trans = new ModbusSerialTransaction(con);
-		} catch (Exception e) {
-
+	public ModbusSerialTransaction getTransaction(boolean current) {
+		if (!current) {
+			trans = null;
+			if (con != null) {
+				con.close();
+			}
+			
+			try {
+				serialParameters = new SerialParameters();
+				serialParameters.setPortName(portName);
+				serialParameters.setBaudRate(baudRate);
+				serialParameters.setDatabits(databits);
+				serialParameters.setParity(parity);
+			    serialParameters.setStopbits(stopbits);
+			    serialParameters.setEncoding(encoding);
+			    serialParameters.setReceiveTimeout(receiveTimeout);
+			    serialParameters.setEcho(false);
+			    
+			    con = new SerialConnection(serialParameters);
+			    con.open();
+			    
+			    trans = new ModbusSerialTransaction(con);
+			} catch (Exception e) {
+	
+			}			
 		}
 		return trans;
 	}
 	
-	public ModbusSerialTransaction getTransaction(SerialParameters serialParameters) {
-		ModbusSerialTransaction trans = null;
+	public void setTransaction(SerialParameters serialParameters) {
 		if (con != null) {
 			con.close();
 		}
+		trans = null;
 		
 		try {
 		    con = new SerialConnection(serialParameters);
@@ -103,7 +105,6 @@ public class ToolsModbus implements Serializable {
 		} catch (Exception e) {
 
 		}
-		return trans;
 	}
 	
 	public List<Object> getDevices(Device device, Properties props) {
@@ -123,7 +124,7 @@ public class ToolsModbus implements Serializable {
 
 		for(int speed : speeds) {
 			setBaudRate(speed);
-			trans = getTransaction();
+			trans = getTransaction(false);
 		
 			for (int i = begAddress; i < endAddress + 1; i++) {	
 			    req.setUnitID(i);	
@@ -411,9 +412,5 @@ public class ToolsModbus implements Serializable {
 		this.stopbits = stopbits;
 		this.encoding = encoding;
 		this.receiveTimeout = receiveTimeout;
-	}
-
-	public ModbusSerialTransaction getTrans() {
-		return trans;
 	}
 }

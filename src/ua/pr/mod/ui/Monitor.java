@@ -53,13 +53,14 @@ public class Monitor extends JDialog {
 	private int address;
 	private Device device;
 	private ModbusSerialTransaction trans;
-	public Monitor(int address, Device device, ModbusSerialTransaction trans, ToolsModbus tm) {
+	
+	public Monitor(int address, Device device, ToolsModbus tm) {
 		setModal(true);
 		
 		this.address = address;
 		this.device = device;
-		this.trans = trans;
 		this.tm = tm;
+		trans = tm.getTransaction(true);
 //		-----------------------------------------------------
 		pTopTS = new JPanel(new GridLayout(1, 0, 20, 1));
 		Border border = BorderFactory.createTitledBorder("Телесигнали");

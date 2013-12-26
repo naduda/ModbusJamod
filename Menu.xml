@@ -1,10 +1,8 @@
 <menubar uniqueID="mainMenu">
-	<menu uniqueID="menu_1" name="Інструменти">
-		<menuitem uniqueID="i_1" name="instr1" />		
-	</menu>
 	<panel align="left">
 		<item uniqueID="btnFind" type="button" name="Find" size="100;20" />
 		<item uniqueID="btnMonitor" type="button" name="Monitor" size="100;20" />
+		<item uniqueID="btnSettings" type="button" name="Settings" size="100;20" />
 	</panel>
 
 	<panel align="right">
