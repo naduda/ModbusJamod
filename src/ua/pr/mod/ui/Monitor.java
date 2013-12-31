@@ -23,6 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 
+import ua.pr.mod.Main;
 import ua.pr.mod.common.NumArray;
 import ua.pr.mod.modbus.ToolsModbus;
 import ua.pr.mod.xml.objects.Device;
@@ -61,6 +62,7 @@ public class Monitor extends JDialog {
 		this.device = device;
 		this.tm = tm;
 		trans = tm.getTransaction(true);
+		Main.log.log(Level.INFO, "     Monitoring".toUpperCase());
 //		-----------------------------------------------------
 		pTopTS = new JPanel(new GridLayout(1, 0, 20, 1));
 		Border border = BorderFactory.createTitledBorder("Телесигнали");
@@ -193,11 +195,10 @@ public class Monitor extends JDialog {
 				iterFault = iterFault + tries;
 				tries = 0;
 			} catch (Exception e) {
-				log.log(Level.INFO, "Exception: ", e);
+				log.log(Level.SEVERE, "Exception: ", e);
 				iterFault++;
 			}
 		}
-		tm.getCon().close();
 	}
 	
 	private void setBG(JComponent comp, Color col) {

@@ -5,10 +5,14 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
+
 import javax.swing.UIManager;
+
+import ua.pr.common.MyFormatter;
 import ua.pr.common.ToolsPrLib;
 import ua.pr.mod.ui.MainFrame;
 import ua.pr.mod.xml.EntityFromXML;
@@ -17,12 +21,21 @@ import ua.pr.mod.Main;
 
 public class Main implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private static Logger log = Logger.getLogger(Main.class.getName());
+	public static Logger log = Logger.getLogger(Main.class.getName());
 	private static final String CONNECT_XML_PATH = "Settings.xml";
 	
 	public Main() {
 		try {
-            LogManager.getLogManager().readConfiguration(Main.class.getResourceAsStream("/logging.properties"));
+            log.setUseParentHandlers(false);
+           
+            MyFormatter formatter = new MyFormatter();
+            ConsoleHandler handler = new ConsoleHandler();
+            handler.setFormatter(formatter);
+            log.addHandler(handler);
+            
+            FileHandler fHandler = new FileHandler("log", 100000, 3);
+            fHandler.setFormatter(formatter);
+            log.addHandler(fHandler);
         } catch (IOException e) {
             System.err.println("Could not setup logger configuration: " + e);
         }
@@ -33,7 +46,7 @@ public class Main implements Serializable {
 			arch = arch.toLowerCase().equals("x86") ? "32" : "64";
 			ToolsPrLib.addLibraryPath(libDir + File.separator + arch);	
 	    } catch (Exception e) {
-	    	log.log(Level.INFO, "UIManager Exception ...   ", e);
+	    	log.log(Level.SEVERE, "UIManager Exception ...   ", e);
 	    }
 //		-----------------------------------------------------------------
 		EntityFromXML efx = new EntityFromXML();
@@ -73,7 +86,7 @@ public class Main implements Serializable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
+		
 		new Main();	
 	}
 }

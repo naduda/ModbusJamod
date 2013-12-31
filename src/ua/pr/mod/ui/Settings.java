@@ -1,10 +1,12 @@
 package ua.pr.mod.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -27,6 +29,7 @@ import net.wimpi.modbus.procimg.Register;
 import net.wimpi.modbus.procimg.SimpleRegister;
 import net.wimpi.modbus.util.SerialParameters;
 import ua.pr.common.ToolsPrLib;
+import ua.pr.mod.Main;
 import ua.pr.mod.modbus.ToolsModbus;
 import ua.pr.mod.xml.objects.Base;
 import ua.pr.mod.xml.objects.Device;
@@ -34,7 +37,7 @@ import ua.pr.mod.xml.objects.Speed;
 
 public class Settings extends JDialog {
 	private static final long serialVersionUID = 1L;
-
+	
 	private JLabel curAddr;
 	private JSpinner spAddr;
 	private JLabel curSpeed;
@@ -112,42 +115,41 @@ public class Settings extends JDialog {
 				int newAddress = Integer.parseInt(spAddr.getValue().toString());
 				Speed speed = (Speed)cbSpeed.getSelectedItem();
 				if ((sd.getAddress() != newAddress) || (sd.getSpeed() != speed.getValue())) {
-					changeSettings(newAddress, speed.getId() + 2, (sd.getSpeed() != speed.getValue()));
-					
-					
+					changeSettings(newAddress, speed.getId() + 2, (sd.getSpeed() != speed.getValue()), (sd.getAddress() != newAddress));
 				}
 			} 
-			ToolsPrLib.getActiveForm((JComponent) e.getSource(), Settings.class).setVisible(false);
+			Container actForm = ToolsPrLib.getActiveForm((JComponent) e.getSource(), Settings.class);
+			actForm.setVisible(false);
+			((JDialog)actForm).dispose();
 		}
 	}
 //	---------------------------------------------------------------------------------------------------------------------
-	private void changeSettings(int newAddress, int newSpeed, boolean changSpeed) {
-		
+	private void changeSettings(int newAddress, int newSpeed, boolean changeSpeed, boolean changeNumber) {		
 		try {			
 			Device device = base.getDeviceByName(sd.getType());
 			ModbusRequest req = null;
 			
-			if (sd.getType().toLowerCase().equals("nik 1f")) {
-				req = new WriteMultipleRegistersRequest(
-						Integer.parseInt(device.getModbusIdAddress(), 16), new Register[] {new SimpleRegister((byte)0, (byte)newAddress)});
-			} else if (sd.getType().toLowerCase().equals("akon")) {
-				Register reg1 = new SimpleRegister(1);
-				Register reg2 = new SimpleRegister((byte)newSpeed, (byte)newAddress);
-				req = new WriteMultipleRegistersRequest(
-						Integer.parseInt(device.getModbusIdAddress(), 16), new Register[] {reg1, reg2});
-			}
-			
-			trans.setRequest(req);
-			req.setUnitID(sd.getAddress());
-			req.setHeadless();
-
-			try {
+			if (changeNumber) {
+				Main.log.log(Level.INFO, "     Changing number".toUpperCase());
+				if (sd.getType().toLowerCase().equals("nik 1f")) {
+					req = new WriteMultipleRegistersRequest(
+							Integer.parseInt(device.getModbusIdAddress(), 16), new Register[] {new SimpleRegister((byte)0, (byte)newAddress)});
+				} else if (sd.getType().toLowerCase().equals("akon")) {
+					Register reg1 = new SimpleRegister(1);
+					Register reg2 = new SimpleRegister((byte)newSpeed, (byte)newAddress);
+					req = new WriteMultipleRegistersRequest(
+							Integer.parseInt(device.getModbusIdAddress(), 16), new Register[] {reg1, reg2});
+				}
+				trans.setRequest(req);
+				req.setUnitID(sd.getAddress());
+				req.setHeadless();
+				Main.log.log(Level.INFO, "S -> " + req.getHexMessage());
 				trans.execute();
-			} catch (Exception e) {
-				
-			}
-		
-			if (changSpeed) {
+				Main.log.log(Level.INFO, "R <- " + trans.getResponse().getHexMessage());
+			}			
+
+			if (changeSpeed) {
+				Main.log.log(Level.INFO, "     Changing speed".toUpperCase());
 				if (sd.getType().toLowerCase().equals("nik 1f")) {
 					req = new WriteMultipleRegistersRequest(
 							Integer.parseInt("F201", 16), new Register[] {new SimpleRegister((byte)0, (byte)newSpeed)});
@@ -155,9 +157,12 @@ public class Settings extends JDialog {
 					req.setUnitID(newAddress);
 					req.setHeadless();
 					trans.setRetries(5);
+					Main.log.log(Level.INFO, "S -> " + req.getHexMessage());
 					trans.execute();
+					Main.log.log(Level.INFO, "R <- " + trans.getResponse().getHexMessage());
 				} 
 				trans = newTransaction(Integer.parseInt(cbSpeed.getSelectedItem().toString()));
+				Main.log.log(Level.INFO, "Changed Port Speed to " + cbSpeed.getSelectedItem().toString() + " -------------------");
 			}
 
 			req = new ReadMultipleRegistersRequest(Integer.parseInt(device.getSerialNumberAddress(), 16), 
@@ -166,7 +171,6 @@ public class Settings extends JDialog {
 			trans.setRequest(req);
 			req.setUnitID(newAddress);
 			req.setHeadless();
-			trans.execute();
 
 			if (saveSettings(newAddress, device)) {
 				table.setValueAt(newAddress, table.getSelectedRow(), 1);
@@ -182,6 +186,7 @@ public class Settings extends JDialog {
 	}
 
 	private boolean saveSettings(int addr, Device device) {
+		Main.log.log(Level.INFO, "     Saving".toUpperCase());
 		try {
 			Register reg1 = new SimpleRegister(0);
 			Register reg2 = sd.getType().toLowerCase().equals("nik 1f") ? new SimpleRegister(3) : new SimpleRegister(0);
@@ -190,12 +195,15 @@ public class Settings extends JDialog {
 
 			trans.setRequest(req);
 			req.setUnitID(addr);
-			trans.setRetries(50);
 			req.setHeadless();
+			trans.setRetries(50);
 
+			Main.log.log(Level.INFO, "S -> " + req.getHexMessage());
 			trans.execute();
+			Main.log.log(Level.INFO, "R <- " + trans.getResponse().getHexMessage());
 			return true;
 		} catch (Exception e) {
+			Main.log.log(Level.INFO, "     Saving error!!!".toUpperCase());
 			return false;
 		}
 	}

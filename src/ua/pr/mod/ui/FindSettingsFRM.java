@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.nio.IntBuffer;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -27,6 +28,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
 import ua.pr.common.ToolsPrLib;
+import ua.pr.mod.Main;
 import ua.pr.mod.modbus.ToolsModbus;
 import ua.pr.mod.xml.objects.Base;
 import ua.pr.mod.xml.objects.ComPortSettings;
@@ -54,7 +56,6 @@ public class FindSettingsFRM extends JDialog implements Serializable {
 		this.base = base;
 		this.table = table;
 		
-		table.removeAllRows();
 //		----------------------------------------------
 		JPanel pMain = new JPanel(new GridLayout(0, 2, 5, 1));
 		Border border = BorderFactory.createTitledBorder("Параметри");
@@ -193,6 +194,9 @@ public class FindSettingsFRM extends JDialog implements Serializable {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (name.toLowerCase().equals("find")) {
+				Main.log.log(Level.INFO, "     Finding device(s)".toUpperCase());
+				table.removeAllRows();
+				
 				Properties props = new Properties();
 				props.put("Type", cbType.getSelectedItem().toString());
 				props.put("Port", cbPort.getSelectedItem().toString());

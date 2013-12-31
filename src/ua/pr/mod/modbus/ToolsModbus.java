@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
 
+import ua.pr.mod.Main;
 import ua.pr.mod.common.NumArray;
 import ua.pr.mod.xml.objects.Device;
 import ua.pr.mod.xml.objects.Signal;
@@ -123,6 +125,7 @@ public class ToolsModbus implements Serializable {
 		ReadMultipleRegistersResponse res = null;
 
 		for(int speed : speeds) {
+			Main.log.log(Level.INFO, "Speed = " + speed);
 			setBaudRate(speed);
 			trans = getTransaction(false);
 		
@@ -132,9 +135,11 @@ public class ToolsModbus implements Serializable {
 
 				trans.setRequest(req);
 				try {
+					Main.log.log(Level.INFO, "S -> " + req.getHexMessage());
 					trans.execute();
 					res = (ReadMultipleRegistersResponse) trans.getResponse();
-
+					Main.log.log(Level.INFO, "R <- " + res.getHexMessage());
+					
 					if (res != null) {
 						ByteBuffer bb = ByteBuffer.allocate(res.getWordCount() * 2);
 						for (int n = 0; n < res.getWordCount(); n++) {
@@ -267,7 +272,10 @@ public class ToolsModbus implements Serializable {
 			
 			try {
 				trans.setRequest(req);
-				tries = trans.execute();
+				
+				Main.log.log(Level.INFO, "S -> " + req.getHexMessage());
+				trans.execute();
+				Main.log.log(Level.INFO, "R <- " + trans.getResponse().getHexMessage());
 				
 				resp = (ReadMultipleRegistersResponse) trans.getResponse();
 
@@ -307,7 +315,9 @@ public class ToolsModbus implements Serializable {
 		ReadMultipleRegistersResponse resp = null;
 		try {
 			trans.setRequest(req);
-			tries = trans.execute();
+			Main.log.log(Level.INFO, "S -> " + req.getHexMessage());
+			trans.execute();
+			Main.log.log(Level.INFO, "R <- " + trans.getResponse().getHexMessage());
 			
 			resp = (ReadMultipleRegistersResponse) trans.getResponse();
 

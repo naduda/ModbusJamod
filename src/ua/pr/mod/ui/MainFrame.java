@@ -65,7 +65,7 @@ public class MainFrame extends FrameXMLMenuLoader implements Serializable {
 		addWindowListener(new WindowListenerMainFRM());
 	}
 
-	
+	private FindSettingsFRM fFind = null;
 //	********************************************************************
 	class WindowListenerMainFRM implements WindowListener, ActionListener, Serializable {
 		private static final long serialVersionUID = 1L;
@@ -99,7 +99,11 @@ public class MainFrame extends FrameXMLMenuLoader implements Serializable {
 				
 				System.exit(0);
 			} else if(btnName.toLowerCase().equals("find")) {
-				new FindSettingsFRM(base, table, tm);
+				if (fFind != null) {
+					fFind.setVisible(true);
+				} else {
+					fFind = new FindSettingsFRM(base, table, tm);
+				}
 			} else if(btnName.toLowerCase().equals("monitor")) {
 				SelectedDevice sd = new SelectedDevice(table);
 				SerialParameters sp = (SerialParameters) table.getClientProperty("SerialParameters");
