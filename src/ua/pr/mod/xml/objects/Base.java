@@ -18,7 +18,7 @@ public class Base implements Serializable{
 	private MainFRM mainForm;
 	@XmlElement(name="COM")
 	private ComPortSettings comPortSettings;
-	@XmlElementWrapper
+	@XmlElementWrapper(name="speeds")
 	@XmlElement(name="speed")
 	private List<Speed> speeds;
 	@XmlElementWrapper

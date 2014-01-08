@@ -32,9 +32,9 @@
 			<modbusIdAddress>F200</modbusIdAddress>
 			<modbusSaveSettings>1100</modbusSaveSettings>
 			<signals>
-				<signal type="TS" offset="1200" count="4"/>
-				<signal type="TI" offset="1000" count="6"/>
-				<signal type="TU" offset="1208" count="2"/>
+				<signal type="TS" offset="1200" count="8"/>
+				<signal type="TI" offset="1000" count="12"/>
+				<signal type="TU" offset="1208" count="4"/>
 			</signals>
 		</device>
 	</devices>

@@ -13,6 +13,7 @@ import java.util.logging.Level;
 
 import ua.pr.mod.Main;
 import ua.pr.mod.common.NumArray;
+import ua.pr.mod.xml.objects.ComPortSettings;
 import ua.pr.mod.xml.objects.Device;
 import ua.pr.mod.xml.objects.Signal;
 import net.wimpi.modbus.ModbusException;
@@ -308,7 +309,7 @@ public class ToolsModbus implements Serializable {
 
 		Signal sTI = device.getSignalByName(signalName);
 		ReadMultipleRegistersRequest req = 
-				new ReadMultipleRegistersRequest(Integer.parseInt(sTI.getOffset(), 16), sTI.getCount() * 2);
+				new ReadMultipleRegistersRequest(Integer.parseInt(sTI.getOffset(), 16), sTI.getCount());
 		req.setUnitID(address);
 		req.setHeadless();
 
@@ -422,5 +423,15 @@ public class ToolsModbus implements Serializable {
 		this.stopbits = stopbits;
 		this.encoding = encoding;
 		this.receiveTimeout = receiveTimeout;
+	}
+	
+	public void setSerialParameters(ComPortSettings comPortSettings) {
+		this.portName = comPortSettings.getPortName();
+		this.baudRate = comPortSettings.getBaudRate();
+		this.databits = comPortSettings.getDatabits();
+		this.parity = comPortSettings.getParity();
+		this.stopbits = comPortSettings.getStopbits();
+		this.encoding = comPortSettings.getEncoding();
+		this.receiveTimeout = comPortSettings.getReceiveTimeout();
 	}
 }

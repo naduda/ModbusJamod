@@ -5,6 +5,11 @@
 		<item uniqueID="btnSettings" type="button" name="Settings" size="100;20" />
 	</panel>
 
+	<panel align="center">
+		<item uniqueID="cbTemplates" type="combobox" size="100;20" />
+		<item uniqueID="btnRead" type="button" name="Read" size="100;20" />
+	</panel>
+
 	<panel align="right">
 		<item uniqueID="btnExit" type="button" name="Вихід" size="100;20" />
 	</panel>

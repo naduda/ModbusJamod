@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Base>
+	<COM portName="COM1" databits="8" parity="None" stopbits="1" encoding="rtu" baudRate="9600" receiveTimeout="300"/>
+	<ReadRequests>
+		<Request name="Телевимірювання" modbusId="70" offset="1000" count="12" vars="I:2:A;U:2:B;Кут:2:рад;P:2:Вт;Q:2:ВАр;F:2:Гц" type="float"/>
+		<Request name="Телесигналізація" modbusId="70" offset="1200" count="8" vars="TS1:2;TS2:2;TS3:2;TS4:2" type="int"/>
+	</ReadRequests>
+</Base>

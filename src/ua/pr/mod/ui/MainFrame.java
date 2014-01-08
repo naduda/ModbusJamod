@@ -9,11 +9,13 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -24,7 +26,9 @@ import ua.pr.menu.FrameXMLMenuLoader;
 import ua.pr.menu.XMLMenuLoader;
 import ua.pr.mod.modbus.ToolsModbus;
 import ua.pr.mod.ui.MainFrame;
+import ua.pr.mod.xml.EntityFromXML;
 import ua.pr.mod.xml.objects.Base;
+import ua.pr.mod.xml.objects.ReadRequests;
 
 public class MainFrame extends FrameXMLMenuLoader implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -56,6 +60,30 @@ public class MainFrame extends FrameXMLMenuLoader implements Serializable {
 		
 		JButton btnSettings = (JButton) loader.getMenuItem("btnSettings");
 		btnSettings.addActionListener(new WindowListenerMainFRM("Settings", tm));
+		
+		@SuppressWarnings("unchecked")
+		JComboBox<String> cbTemplates = (JComboBox<String>) loader.getMenuItem("cbTemplates");
+		File folder = new File(System.getProperty("user.dir"));
+		FilenameFilter filter = new FilenameFilter() {
+	        public boolean accept(File directory, String fileName) {
+	        	if ((fileName.toLowerCase().endsWith(".xml")) && 
+	        	   (!fileName.toLowerCase().equals("menu.xml")) &&
+	     	       (!fileName.toLowerCase().equals("settings.xml"))) {
+					return true;
+				} else {
+					return false;
+				}
+	        }};
+		File[] listOfFiles = folder.listFiles(filter);
+
+	    for (int i = 0; i < listOfFiles.length; i++) {
+	    	if (listOfFiles[i].isFile()) {
+	    		cbTemplates.addItem(new String(listOfFiles[i].getName()));
+	    	}
+	    }
+	    
+	    JButton btnRead = (JButton) loader.getMenuItem("btnRead");
+	    btnRead.addActionListener(new WindowListenerMainFRM("Read", cbTemplates, tm));
 //		-------------------------------------------------------------
 		JPanel statusBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		JLabel lbStatus = new JLabel("status");
@@ -72,6 +100,7 @@ public class MainFrame extends FrameXMLMenuLoader implements Serializable {
 
 		private String btnName = "";
 		private ToolsModbus tm;
+		private Object obj;
 		
 		public WindowListenerMainFRM() {
 			
@@ -80,6 +109,7 @@ public class MainFrame extends FrameXMLMenuLoader implements Serializable {
 		public WindowListenerMainFRM(String btnName, Object obj, ToolsModbus tm) {
 			this.btnName = btnName; 
 			this.tm = tm;
+			this.obj = obj;
 		}
 		
 		public WindowListenerMainFRM(String btnName, ToolsModbus tm) {
@@ -128,6 +158,14 @@ public class MainFrame extends FrameXMLMenuLoader implements Serializable {
 				} else if (sd.getType().toLowerCase().equals("akon")) {
 					new Settings(base, sd, tm, table);
 				}
+			} else if(btnName.toLowerCase().equals("read")) {
+				@SuppressWarnings("unchecked")
+				File f = new File(System.getProperty("user.dir") + File.separator + 
+						((JComboBox<String>)obj).getSelectedItem());
+				EntityFromXML efx = new EntityFromXML();
+				ReadRequests rRequest = (ReadRequests) efx.getObject(f.getAbsolutePath(), ReadRequests.class);
+
+				new ReadFRM(rRequest, tm);
 			}
 		}	
 		

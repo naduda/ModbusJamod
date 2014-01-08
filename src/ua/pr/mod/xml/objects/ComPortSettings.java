@@ -11,6 +11,8 @@ public class ComPortSettings implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@XmlAttribute
+	private String portName;
+	@XmlAttribute
 	private int databits;
 	@XmlAttribute
 	private String parity;
@@ -18,7 +20,19 @@ public class ComPortSettings implements Serializable {
 	private int stopbits;
 	@XmlAttribute
 	private String encoding;
+	@XmlAttribute
+	private int baudRate;
+	@XmlAttribute
+	private int receiveTimeout;
 	
+	public String getPortName() {
+		return portName;
+	}
+
+	public void setPortName(String portName) {
+		this.portName = portName;
+	}
+
 	public int getDatabits() {
 		return databits;
 	}
@@ -49,5 +63,21 @@ public class ComPortSettings implements Serializable {
 	
 	public void setEncoding(String encoding) {
 		this.encoding = encoding;
+	}
+
+	public int getBaudRate() {
+		return baudRate;
+	}
+
+	public void setBaudRate(int baudRate) {
+		this.baudRate = baudRate;
+	}
+
+	public int getReceiveTimeout() {
+		return receiveTimeout;
+	}
+
+	public void setReceiveTimeout(int receiveTimeout) {
+		this.receiveTimeout = receiveTimeout;
 	}
 }
