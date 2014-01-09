@@ -71,11 +71,12 @@ public class Main implements Serializable {
 			}
 		} else {
 			mainFrame = new MainFrame(base);
+			mainFrame.setLocationRelativeTo(null);
 		}
 //	--------------------------------------------------------------------
+		ToolsPrLib.HideOnEsc(mainFrame, true);
 		mainFrame.addMainPanel();
 		mainFrame.setResizable(false);
-		mainFrame.setLocationRelativeTo(null);
 		mainFrame.pack();
 		mainFrame.setVisible(true);
 	}

@@ -41,6 +41,7 @@ public class ReadFRM extends JDialog {
 		this.rr = rr;
 		
 		Main.log.log(Level.INFO, "     Reading".toUpperCase());
+		ToolsPrLib.HideOnEsc(this, false);
 		listLabels = new ArrayList<>();
 //		----------------------------------------------
 		JPanel pMain = new JPanel(new GridLayout(0, 1, 5, 1));
@@ -94,11 +95,15 @@ public class ReadFRM extends JDialog {
 						Main.log.log(Level.INFO, "R <- " + trans.getResponse().getHexMessage());
 						resp = (ReadMultipleRegistersResponse) trans.getResponse();
 						if (resp != null) {
-							for (int i = 0; i < resp.getWordCount()/2; i++) {
-								ByteBuffer bb = ByteBuffer.allocate(4);
-								for (int j = 0; j < 2; j++) {
-									bb.put(resp.getRegister(2 * i + j).toBytes());
+							String[] vv = r.getVars().split(";");
+							int regBeg = 0;
+							for (int i = 0; i < vv.length; i++) {
+								int countBytes = Integer.parseInt(vv[i].split(":")[1]);
+								ByteBuffer bb = ByteBuffer.allocate(countBytes);
+								for (int j = 0; j < countBytes/2; j++) {
+									bb.put(resp.getRegister(regBeg + j).toBytes());
 								}
+								regBeg = regBeg + countBytes/2;
 								
 								if (r.getType_().toLowerCase().equals("float")) {
 									res.add(ModbusUtil.registersToFloat(bb.array()));

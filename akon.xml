@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Base>
+	<COM portName="COM1" databits="8" parity="None" stopbits="1" encoding="rtu" baudRate="9600" receiveTimeout="300"/>
+	<ReadRequests>
+		<Request name="Cтрум" modbusId="1" offset="100" count="2" vars="I:4:A" type="float"/>
+		<Request name="Напруга" modbusId="1" offset="200" count="2" vars="U:4:B" type="float"/>
+		<Request name="TC" modbusId="1" offset="b10" count="2" vars="TC1:4" type="int"/>
+		<Request name="TC" modbusId="1" offset="c10" count="2" vars="TC2:4" type="int"/>
+		<Request name="TC" modbusId="1" offset="d10" count="2" vars="TC3:4" type="int"/>
+		<Request name="TC" modbusId="1" offset="e10" count="2" vars="TC4:4" type="int"/>
+	</ReadRequests>
+</Base>

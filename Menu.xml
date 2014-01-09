@@ -8,6 +8,7 @@
 	<panel align="center">
 		<item uniqueID="cbTemplates" type="combobox" size="100;20" />
 		<item uniqueID="btnRead" type="button" name="Read" size="100;20" />
+		<item uniqueID="btnWrite" type="button" name="Write" size="100;20" />
 	</panel>
 
 	<panel align="right">

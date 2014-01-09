@@ -168,6 +168,7 @@ public class ToolsModbus implements Serializable {
 	}
 
 	public int changeTUAkon(int idTU, ModbusSerialTransaction trans, Device sd, int currentAddress) {
+		Main.log.log(Level.INFO, "     Change TU Akon".toUpperCase());
 		float curVal = (Float) getSignals(currentAddress, sd, trans, "TU", "int").getList().get(idTU - 1);
 
 		int tries = 0;	
@@ -179,7 +180,9 @@ public class ToolsModbus implements Serializable {
 		req.setHeadless();
 
 		try {
+			Main.log.log(Level.INFO, "S -> " + req.getHexMessage());
 			tries = trans.execute();
+			Main.log.log(Level.INFO, "R <- " + trans.getResponse().getHexMessage());
 			ReadMultipleRegistersResponse res = (ReadMultipleRegistersResponse) trans.getResponse();
 
 			ByteBuffer bb = ByteBuffer.allocate(res.getWordCount() * 2);
@@ -205,7 +208,9 @@ public class ToolsModbus implements Serializable {
 			
 			trans.setRequest(wReq);
 
+			Main.log.log(Level.INFO, "S -> " + req.getHexMessage());
 			tries = tries + trans.execute();
+			Main.log.log(Level.INFO, "R <- " + trans.getResponse().getHexMessage());
 		} catch (ModbusIOException e1) {
 			e1.printStackTrace();
 		} catch (ModbusSlaveException e1) {
@@ -214,10 +219,12 @@ public class ToolsModbus implements Serializable {
 			e1.printStackTrace();
 		}
 		
+		Main.log.log(Level.INFO, "     End Change TU Akon".toUpperCase());
 		return tries;
 	}
 	
 	public int changeTUnik1F(int idTU, ModbusSerialTransaction trans, Device device, int currentAddress) {
+		Main.log.log(Level.INFO, "     Change TU Nik".toUpperCase());
 		String sTU = idTU == 1 ? "1209" : "120B";
 
 		ModbusRequest req = null;		
@@ -232,7 +239,9 @@ public class ToolsModbus implements Serializable {
 			trans.setRequest(req);
 			req.setUnitID(currentAddress);
 			req.setHeadless();
+			Main.log.log(Level.INFO, "S -> " + req.getHexMessage());
 			tries = trans.execute();
+			Main.log.log(Level.INFO, "R <- " + trans.getResponse().getHexMessage());
 		
 			regCode = new SimpleRegister(curVal == 1 ? 0 : 1);
 			req = new WriteMultipleRegistersRequest(Integer.parseInt(sTU, 16), new Register[] {regCode});
@@ -240,7 +249,9 @@ public class ToolsModbus implements Serializable {
 			req.setHeadless();			
 			trans.setRequest(req);
 			
+			Main.log.log(Level.INFO, "S -> " + req.getHexMessage());
 			tries = tries + trans.execute();
+			Main.log.log(Level.INFO, "R <- " + trans.getResponse().getHexMessage());			
 		} catch (ModbusIOException e1) {
 			e1.printStackTrace();
 		} catch (ModbusSlaveException e1) {
@@ -248,6 +259,7 @@ public class ToolsModbus implements Serializable {
 		} catch (ModbusException e1) {
 			e1.printStackTrace();
 		}
+		Main.log.log(Level.INFO, "     End Change TU Nik".toUpperCase());
 		return tries;
 	}
 	

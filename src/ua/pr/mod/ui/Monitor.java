@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -22,7 +21,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
-
+import ua.pr.common.ToolsPrLib;
 import ua.pr.mod.Main;
 import ua.pr.mod.common.NumArray;
 import ua.pr.mod.modbus.ToolsModbus;
@@ -57,12 +56,14 @@ public class Monitor extends JDialog {
 	
 	public Monitor(int address, Device device, ToolsModbus tm) {
 		setModal(true);
+		setTitle("Monitoring");
 		
 		this.address = address;
 		this.device = device;
 		this.tm = tm;
 		trans = tm.getTransaction(true);
 		Main.log.log(Level.INFO, "     Monitoring".toUpperCase());
+		ToolsPrLib.HideOnEsc(this, false);
 //		-----------------------------------------------------
 		pTopTS = new JPanel(new GridLayout(1, 0, 20, 1));
 		Border border = BorderFactory.createTitledBorder("Телесигнали");
@@ -253,7 +254,8 @@ public class Monitor extends JDialog {
 	class MyActionListener implements ActionListener {
 		private int value;
 		
-		public MyActionListener(int value, int address, Device device, ModbusSerialTransaction trans, ToolsModbus tm) {
+		public MyActionListener(int value, int address, Device device, 
+									ModbusSerialTransaction trans, ToolsModbus tm) {
 			this.value = value;
 		}
 		

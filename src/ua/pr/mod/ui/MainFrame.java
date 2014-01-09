@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
@@ -40,6 +42,7 @@ public class MainFrame extends FrameXMLMenuLoader implements Serializable {
 	private TableDevice table;
 	private JScrollPane spTable;
 	private JPanel pMain;
+	private ToolsModbus tm;
 	
 	public MainFrame(Base base) {
 		super(base.getMainForm().getTitle(), MENU_XML_PATH);
@@ -47,19 +50,19 @@ public class MainFrame extends FrameXMLMenuLoader implements Serializable {
 
 		loader = getLoader();
 //		-------------------------------------------------------------
-		ToolsModbus tm = new ToolsModbus();
+		tm = new ToolsModbus();
 		
 		JButton btnExit = (JButton) loader.getMenuItem("btnExit");
-		btnExit.addActionListener(new WindowListenerMainFRM("Exit", tm));
+		btnExit.addActionListener(new WindowListenerMainFRM("Exit"));
 		
 		JButton btnFind = (JButton) loader.getMenuItem("btnFind");
-		btnFind.addActionListener(new WindowListenerMainFRM("Find", tm));
+		btnFind.addActionListener(new WindowListenerMainFRM("Find"));
 		
 		JButton btnMonitor = (JButton) loader.getMenuItem("btnMonitor");
-		btnMonitor.addActionListener(new WindowListenerMainFRM("Monitor", tm));
+		btnMonitor.addActionListener(new WindowListenerMainFRM("Monitor"));
 		
 		JButton btnSettings = (JButton) loader.getMenuItem("btnSettings");
-		btnSettings.addActionListener(new WindowListenerMainFRM("Settings", tm));
+		btnSettings.addActionListener(new WindowListenerMainFRM("Settings"));
 		
 		@SuppressWarnings("unchecked")
 		JComboBox<String> cbTemplates = (JComboBox<String>) loader.getMenuItem("cbTemplates");
@@ -83,7 +86,10 @@ public class MainFrame extends FrameXMLMenuLoader implements Serializable {
 	    }
 	    
 	    JButton btnRead = (JButton) loader.getMenuItem("btnRead");
-	    btnRead.addActionListener(new WindowListenerMainFRM("Read", cbTemplates, tm));
+	    btnRead.addActionListener(new WindowListenerMainFRM("Read", cbTemplates));
+	    
+	    JButton btnWrite = (JButton) loader.getMenuItem("btnWrite");
+	    btnWrite.addActionListener(new WindowListenerMainFRM("Write", cbTemplates));
 //		-------------------------------------------------------------
 		JPanel statusBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		JLabel lbStatus = new JLabel("status");
@@ -95,38 +101,38 @@ public class MainFrame extends FrameXMLMenuLoader implements Serializable {
 
 	private FindSettingsFRM fFind = null;
 //	********************************************************************
+	private void closeConnection() {
+		if (tm.getCon() != null) {
+			try {
+				tm.getCon().close();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+		}
+		System.exit(0);
+	}
 	class WindowListenerMainFRM implements WindowListener, ActionListener, Serializable {
 		private static final long serialVersionUID = 1L;
 
 		private String btnName = "";
-		private ToolsModbus tm;
 		private Object obj;
 		
 		public WindowListenerMainFRM() {
 			
 		}
 		
-		public WindowListenerMainFRM(String btnName, Object obj, ToolsModbus tm) {
+		public WindowListenerMainFRM(String btnName, Object obj) {
 			this.btnName = btnName; 
-			this.tm = tm;
 			this.obj = obj;
 		}
 		
-		public WindowListenerMainFRM(String btnName, ToolsModbus tm) {
+		public WindowListenerMainFRM(String btnName) {
 			this.btnName = btnName;
-			this.tm = tm;
 		}
 		
 		public void actionPerformed(ActionEvent e) {
 			if (btnName.toLowerCase().equals("exit")) {
-				if (tm.getCon() != null) {
-					try {
-						tm.getCon().close();
-					} catch (Exception e1) {
-						e1.printStackTrace();
-					}
-				}
-				
+				closeConnection();				
 				System.exit(0);
 			} else if(btnName.toLowerCase().equals("find")) {
 				if (fFind != null) {
@@ -166,6 +172,14 @@ public class MainFrame extends FrameXMLMenuLoader implements Serializable {
 				ReadRequests rRequest = (ReadRequests) efx.getObject(f.getAbsolutePath(), ReadRequests.class);
 
 				new ReadFRM(rRequest, tm);
+			} else if(btnName.toLowerCase().equals("write")) {
+				@SuppressWarnings("unchecked")
+				File f = new File(System.getProperty("user.dir") + File.separator + 
+						((JComboBox<String>)obj).getSelectedItem());
+				EntityFromXML efx = new EntityFromXML();
+				ReadRequests rRequest = (ReadRequests) efx.getObject(f.getAbsolutePath(), ReadRequests.class);
+				
+				new WriteFRM(rRequest, tm);
 			}
 		}	
 		
@@ -180,6 +194,7 @@ public class MainFrame extends FrameXMLMenuLoader implements Serializable {
 			} catch (Exception e2) {
 				e2.printStackTrace();
 			} finally {
+				closeConnection();
 				try {
 					oos.close();
 				} catch (IOException e1) {
@@ -189,38 +204,31 @@ public class MainFrame extends FrameXMLMenuLoader implements Serializable {
 		}
 
 		@Override
-		public void windowActivated(WindowEvent e) {
-			// TODO Auto-generated method stub
-			
+		public void windowActivated(WindowEvent e) {			
 		}
 
 		@Override
 		public void windowClosed(WindowEvent e) {
-			// TODO Auto-generated method stub
-			
+			closeConnection();
 		}
 
 		@Override
 		public void windowDeactivated(WindowEvent e) {
-			// TODO Auto-generated method stub
 			
 		}
 
 		@Override
 		public void windowDeiconified(WindowEvent e) {
-			// TODO Auto-generated method stub
 			
 		}
 
 		@Override
 		public void windowIconified(WindowEvent e) {
-			// TODO Auto-generated method stub
 			
 		}
 
 		@Override
 		public void windowOpened(WindowEvent e) {
-			// TODO Auto-generated method stub
 			
 		}
 	}
