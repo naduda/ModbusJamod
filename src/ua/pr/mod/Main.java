@@ -56,18 +56,11 @@ public class Main implements Serializable {
 		String pathOfFormState = ToolsPrLib.getFullPath(base.getMainForm().getPathOfFormState());
 		File frmState = new File(pathOfFormState);
 		if (frmState.exists()) {
-			ObjectInputStream ois = null;
-			try {
-				ois = new ObjectInputStream(new FileInputStream(frmState));
+			//ObjectInputStream ois = null;
+			try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(frmState))) {	
 				mainFrame = ((MainFrame) ois.readObject());
 			} catch (Exception e) {
-				e.printStackTrace();
-			} finally {
-				try {
-					ois.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				log.log(Level.SEVERE, "Error in frmState load ...", e);
 			}
 		} else {
 			mainFrame = new MainFrame(base);

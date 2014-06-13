@@ -43,11 +43,7 @@ public class ToolsModbus implements Serializable {
 	private SerialConnection con;
 	private SerialParameters serialParameters;
 	private ModbusSerialTransaction trans;
-	
-	/**
-	 * portType = CommPortIdentifier.PORT_SERIAL;
-	 *
-	 */
+
 	public static List<String> getCOMPortList(int portType) {
 		List<String> ret = new ArrayList<>();
 		
@@ -135,6 +131,7 @@ public class ToolsModbus implements Serializable {
 				req.setHeadless();
 
 				trans.setRequest(req);
+				
 				try {
 					Main.log.log(Level.INFO, "S -> " + req.getHexMessage());
 					trans.execute();
@@ -149,14 +146,10 @@ public class ToolsModbus implements Serializable {
 
 						ret.add(new Object[] {device.getName(), req.getUnitID(), 
 								ModbusUtil.registersToInt(bb.array()), speed});
-						break;
+						if (isOne) break;
 					}
-				} catch (ModbusIOException e) {
-					System.err.println("ModbusIOException");
-				} catch (ModbusSlaveException e) {
-					System.err.println("ModbusSlaveException");
 				} catch (ModbusException e) {
-					System.err.println("ModbusException");
+					Main.log.log(Level.SEVERE, e.toString());
 				}
 			}
 			if ((res != null) && (isOne)) {

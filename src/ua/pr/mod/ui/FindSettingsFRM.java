@@ -194,6 +194,13 @@ public class FindSettingsFRM extends JDialog implements Serializable {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (name.toLowerCase().equals("find")) {
+				ToolsPrLib.getActiveForm((JComponent) e.getSource(), FindSettingsFRM.class).setVisible(false);
+				
+				if ("".equals(cbPort.getSelectedItem().toString())) {
+					Main.log.log(Level.SEVERE, "Not found COM-Port");
+					return;
+				}
+				
 				Main.log.log(Level.INFO, "     Finding device(s)".toUpperCase());
 				table.removeAllRows();
 				
@@ -226,8 +233,7 @@ public class FindSettingsFRM extends JDialog implements Serializable {
 				for (Object object : rets) {
 					table.addRow((Object[]) object);
 				}
-			}
-			ToolsPrLib.getActiveForm((JComponent) e.getSource(), FindSettingsFRM.class).setVisible(false);
+			}			
 		}		
 	}
 }

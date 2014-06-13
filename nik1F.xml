@@ -2,7 +2,7 @@
 <Base>
 	<COM portName="COM1" databits="8" parity="None" stopbits="1" encoding="rtu" baudRate="9600" receiveTimeout="300"/>
 	<ReadRequests>
-		<Request name="Телевимірювання" modbusId="70" offset="1000" count="12" vars="I:4:A;U:4:B;Кут:4:рад;P:4:Вт;Q:4:ВАр;F:4:Гц" type="float"/>
+		<Request name="Телевимірювання" modbusId="1" offset="1000" count="12" vars="I:4:A;U:4:B;Кут:4:рад;P:4:Вт;Q:4:ВАр;F:4:Гц" type="float"/>
 		<Request name="Телесигналізація" modbusId="70" offset="1200" count="8" vars="TS1:4;TS2:4;TS3:4;TS4:4" type="int"/>
 	</ReadRequests>
 </Base>
